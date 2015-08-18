@@ -1,36 +1,35 @@
-var Class = function(methods) {
-    var _class = function() {
-        this._initialize.apply(this, arguments);
-    };
 
-    for (var property in methods) {
-       _class.prototype[property] = methods[property];
-    }
 
-    if (!_class.prototype._initialize) _class.prototype._initialize = function(){};
-
-    return _class;
-};
-
-var Scrollo = new Class({
+function Scrollolol(options) {
 
 	// options = {
 	// 'scrollSpeed': 500,
 	// ...
 	// }
 
-	_defaultOptions: {
+
+
+	var _defaultOptions =  {
 		'scrollSpeed': 500,
     'activeClass': 'active',
     'inactiveClass': 'inactive'
-	},
+	};
 
-  _callbacks: {
+  ///////////////
+  // Callbacks //
+  ///////////////
+
+  var _callbacks = {
     _didScrollToSection: function(){},
     _didClickMenuItem: function(){}
-  },
+  };
 
-  _validateSelector: function(selector) {
+  /////////////////////
+  // Private methods //
+  /////////////////////
+
+
+  var _validateSelector = function(selector) {
 
     var node;
 
@@ -48,16 +47,14 @@ var Scrollo = new Class({
 
     return node;
 
-  },
+  }
 
-  _setupEventListeners: function() {
+  var _setupEventListeners = function() {
 
-    /////////////////////
-    // Private methods //
-    /////////////////////
 
-    var _onScroll = function(){
-      this._menuLinks.forEach(function(menuLink) {
+
+    var _onScroll = function() {
+      _menuLinks.forEach(function(menuLink) {
 
         var container       = document.querySelector(menuLink.getAttribute('data-target'));
         var rect            = container.getBoundingClientRect();
@@ -65,13 +62,13 @@ var Scrollo = new Class({
 
         if (rect.bottom > 0 && rect.top-viewportHeight < 0) {
           // Highlight menu item
-          menuLink.classList.add(this._defaultOptions.activeClass);
-          menuLink.classList.remove(this._defaultOptions.inactiveClass);
+          menuLink.classList.add(_defaultOptions.activeClass);
+          menuLink.classList.remove(_defaultOptions.inactiveClass);
         }
         else {
           // Dehightlight menu item
-          menuLink.classList.remove(this._defaultOptions.activeClass);
-          menuLink.classList.add(this._defaultOptions.inactiveClass);
+          menuLink.classList.remove(_defaultOptions.activeClass);
+          menuLink.classList.add(_defaultOptions.inactiveClass);
         }
 
 
@@ -87,13 +84,13 @@ var Scrollo = new Class({
     _onScroll();
 
     // Menu clicking
-    this._menuLinks.forEach(function(menuLink) {
+    _menuLinks.forEach(function(menuLink) {
       menuLink.addEventListener('click',function(event) {
 
         event.preventDefault();
         event.stopPropagation();
 
-        this._callbacks._didClickMenuItem(menuLink,container);
+        _callbacks._didClickMenuItem(menuLink,container);
 
         // Perform Scrolling
         var container = document.querySelector(menuLink.getAttribute('data-target'));
@@ -103,66 +100,67 @@ var Scrollo = new Class({
     }.bind(this));
 
 
-  },
+  }
 
-	_initialize: function(navSelector,options) {
+  ////////////////////
+  // Initialization //
+  ////////////////////
 
-		var navigation = this._validateSelector(navSelector)
+	var navigation = _validateSelector(navSelector)
 
-    if (navigation == null) {
-      throw ('Menu selector is incorrect, must be a string containing a reference to a class or id, for example "#my-menu" or .my-menu"')
+  if (navigation == null) {
+    throw ('Menu selector is incorrect, must be a string containing a reference to a class or id, for example "#my-menu" or .my-menu"')
+  }
+
+  // Validate data-target links
+  var targetContainers = [];
+  var menuLinks = Array.prototype.slice.call(navigation.querySelectorAll('[data-target]')).filter(function(node) {
+
+    var targetValue = node.getAttribute('data-target');
+    var targetNode = _validateSelector(targetValue);
+
+    if (targetValue == '') {
+      console.warn('Target selector is empty, removing menu node', node, 'from observer list');
+      return false;
     }
 
-    // Validate data-target links
-    var targetContainers = [];
-    var menuLinks = Array.prototype.slice.call(navigation.querySelectorAll('[data-target]')).filter(function(node) {
-
-      var targetValue = node.getAttribute('data-target');
-      var targetNode = this._validateSelector(targetValue);
-
-      if (targetValue == '') {
-        console.warn('Target selector is empty, removing menu node', node, 'from observer list');
-        return false;
-      }
-
-      if (targetNode == null) {
-        console.warn('Target selector is invalid',targetValue,'Removing menu node', node.innerText, 'from observer list');
-        return false;
-      }
-
-      // Add target node
-      targetContainers.push(targetNode);
-
-      return true;
-
-
-    }.bind(this));
-
-		this._menuLinks = menuLinks;
-    this._targetContainers = targetContainers;
-
-		// Merge with options
-		for (var option in options) {
-				this._defaultOptions[option] = options[option];
-		}
-
-    /////////////////////////////
-    // Initialization complete //
-    /////////////////////////////
-
-    this._setupEventListeners();
-
-    return {
-
-      didScrollToSection: this._callbacks_didScrollToSection,
-      didClickMenuItem: this._callbacks._didClickMenuItem
-
+    if (targetNode == null) {
+      console.warn('Target selector is invalid',targetValue,'Removing menu node', node.innerText, 'from observer list');
+      return false;
     }
 
-	},
+    // Add target node
+    targetContainers.push(targetNode);
+
+    return true;
 
 
-});
+  }.bind(this));
+
+	_menuLinks = menuLinks;
+  _targetContainers = targetContainers;
+
+	// Merge with options
+	for (var option in options) {
+			_defaultOptions[option] = options[option];
+	}
+
+  /////////////////////////////
+  // Initialization complete //
+  /////////////////////////////
+
+  _setupEventListeners();
+
+  return {
+
+    didScrollToSection: _callbacks_didScrollToSection,
+    didClickMenuItem: _callbacks._didClickMenuItem
+
+  }
+
+
+
+};
 
 
 
