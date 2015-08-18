@@ -1,0 +1,7 @@
+# Site settings
+title: GORM
+email: your-email@domain.com
+description: > # The super developer friendly orm for go
+baseurl: "" # the subpath of your site, e.g. /blog/
+url: "http://yourdomain.com" # the base hostname & protocol for your site
+markdown: redcarpet

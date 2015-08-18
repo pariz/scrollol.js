@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+
+  {% include head.html %}
+
+  <body>
+
+
+		<header class="main-header">
+			<h1>
+				<a href="/" class="logo">
+				  Gorm
+				</a>
+			</h1>
+
+			<div class="sub">the super developer friendly ORM for go</div>
+
+			<div class="example">
+<pre><code class="language-go">
+// So friggin' easy!
+type Company struct {
+  Users []User
+}
+
+type User struct {
+  Name      String
+  CompanyID int `sql:"index"`
+}
+</code></pre>
+			</div>
+
+			<button class="light">Get started</button>
+
+		</header>
+
+		<aside class="nav">
+			<ul>
+				<li class="nav-heading"><a href="" data-target=".section-overview">Overview</a></li>
+				<ul>
+          <li><a href="" data-target=".section-getting-started">Getting started</a></li>
+  				<li><a href="" data-target=".section-database-connection">Database connection</a></li>
+          <li><a href="" data-target=".section-conventions">Conventions</a></li>
+        </ul>
+				<li class="nav-heading"><a href="" data-target=".section-migrations">Migrations</a></li>
+				<li class="nav-heading"><a href="" data-target=".section-relations">Relations</a></li>
+			  <li class="nav-heading"><a href="" data-target=".section-querying">Querying</a></li>
+        <li class="nav-heading"><a href="" data-target=".section-advanced-usage">Advanced usage</a></li>
+			</ul>
+		</aside>
+
+    <section class="page-content">
+      <div class="wrapper">
+				<section class="section-overview">
+					{% markdown markdown/overview.md %}
+          <section class="section-getting-started">
+            {% markdown markdown/getting-started.md %}
+          </section>
+          <section class="section-database-connection">
+            {% markdown markdown/database-connection.md %}
+          </section>
+          <section class="section-conventions">
+            {% markdown markdown/conventions.md %}
+          </section>
+				</section>
+        <section class="section-models">
+					{% markdown markdown/models.md %}
+				</section>
+				<section class="section-migrations">
+					{% markdown markdown/migrations.md %}
+				</section>
+				<section class="section-relations">
+					{% markdown markdown/relations.md %}
+				</section>
+        <section class="section-querying">
+					{% markdown markdown/querying.md %}
+				</section>
+				<section class="section-advanced-usage">
+					{% markdown markdown/advanced-usage.md %}
+				</section>
+
+      </div>
+    </section>
+
+
+
+    {% include footer.html %}
+
+  </body>
+
+</html>

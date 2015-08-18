@@ -1,0 +1,7 @@
+class Scrollo {
+
+	function Yes() {
+		
+	}
+
+}
