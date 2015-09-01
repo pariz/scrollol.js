@@ -11,15 +11,7 @@ body {
   background-color:#efefef;
   padding: 2em 0;
   text-align: center;
-  h1 {
-    font-size:0px;
-
-  }
-
-  h1 {
-
-  }
-
+  
   .sub {
     margin-top:1em;
     margin-bottom:1em;
@@ -77,5 +69,10 @@ button {
 }
 
 section {
-  border-top:1px solid red;
+
+  padding: 2em 0;
+}
+
+p:last-child {
+  margin-bottom:0px;
 }

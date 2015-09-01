@@ -1,3 +1,0 @@
-## Basic crud
-
-Todo: Implement
