@@ -1,45 +1,78 @@
 function Scrollol(navSelector, options) {
   'use strict';
 
-  ////////////////////////
-  // Private variables //
-  ////////////////////////
+  // ------------------------------------------------------------------------
+  // Private variables
+  // ------------------------------------------------------------------------
 
   var _dataStateAttribute = 'data-scrollol-state-active';
 
-  var _navigation,
-    _menuLinks,
-    _targetContainers;
+  // DOM elements
+  var _navigation;
+  var _menuLinks;
+  var _targetContainers;
 
   // Default options
   var _defaultOptions = {
     scrollSpeed: 500,
     activeClass: 'active',
     inactiveClass: 'inactive',
-    smoothScrolling: true,
-    highlightNewest: false,
-    hideSubMenus: true
+    smoothScrolling: true
   };
 
-  ///////////////
-  // Callbacks //
-  ///////////////
+  // ------------------------------------------------------------------------
+  // Callbacks
+  // ------------------------------------------------------------------------
 
-  var _defaultCallbacks = {
-    _scrolledToSection: function() {
-      console.log("Scrolling complete", this);
-    },
+  //
+  // _callbacks holds a reference to any callbacks. By default it uses core
+  // callbacks, which can be overridden using the callbacks API.
+  //
+  var _callbacks = {
+
     _clickedOnMenu: function() {
-      console.log("_clickedOnMenu", this);
+      //console.log("_clickedOnMenu", this);
     },
-    _menuCollapsed: function() {
-      console.log("_menuCollapsed", this);
+
+    _menuItemActive: function() {
+      var element = this;
+      var addClass = _defaultOptions.activeClass;
+      var removeClass = _defaultOptions.inactiveClass;
+
+      if (element.classList.contains(addClass) && !element.classList.contains(removeClass)) {
+        return;
+      }
+
+      element.classList.add(addClass);
+      element.classList.remove(removeClass);
+
+    },
+
+    _menuItemInactive: function() {
+      var element = this;
+      var addClass = _defaultOptions.inactiveClass;
+      var removeClass = _defaultOptions.activeClass;
+
+      if (element.classList.contains(addClass) && !element.classList.contains(removeClass)) {
+        return; // 0;
+      }
+
+      element.classList.add(addClass);
+      element.classList.remove(removeClass);
+    },
+
+    // _menuCollapsing handles the menu collapsing. If this function is overridden
+    // using the API, the developer is responsible for hiding the menu
+    _menuCollapsing: function() {
       this.style.display = 'none';
     },
-    _menuExpanded: function() {
-      console.log("_menuExpanded", this);
+
+    // _menuExpanding handles the menu expansion. If this function is overridden
+    // using the API, the developer is responsible for showing the menu
+    _menuExpanding: function() {
       this.style.display = 'block';
     },
+
     // _onScrolling conforms to the easing equations by Robert Penner.
     // For more equations, visit http://gizma.com/easing/
     _onScrolling: function(t, b, c, d) {
@@ -51,47 +84,65 @@ function Scrollol(navSelector, options) {
       }
       t--;
       return -c / 2 * (t * (t - 2) - 1) + b;
+    },
+
+    // _onScrollingComplete fires whenever a scroll is completed.
+    _onScrollingComplete: function() {
+      //console.log("Scrolling complete", this);
     }
 
 
   };
 
-  // _callbacks is holds a reference to the callback functions. Initially it references the _defaultCallbacks
-  var _callbacks = {
-    scrolledToSection: function(o) {
-
-      return _resolveCallback.call(o, _defaultCallbacks, '_scrolledToSection');
-
-    },
+  //
+  // _callbackContainer holds a reference to the callback functions.
+  //
+  var _callbackContainer = {
     clickedOnMenu: function(o) {
 
-      return _resolveCallback.call(o, _defaultCallbacks, '_clickedOnMenu');
+      return _resolveCallback.call(o, _callbacks, '_clickedOnMenu');
 
     },
-    menuCollapsed: function(o) {
+    menuItemActive: function(o, state) {
 
-      return _resolveCallback.call(o, _defaultCallbacks, '_menuCollapsed');
-
+      return _resolveCallback.call(o, _callbacks, '_menuItemActive', state);
 
     },
-    menuExpanded: function(o) {
+    menuItemInactive: function(o, state) {
 
-      return _resolveCallback.call(o, _defaultCallbacks, '_menuExpanded');
+      return _resolveCallback.call(o, _callbacks, '_menuItemInactive', state);
+
+    },
+    menuCollapsing: function(o) {
+
+      return _resolveCallback.call(o, _callbacks, '_menuCollapsing');
+
+    },
+    menuExpanding: function(o) {
+
+      return _resolveCallback.call(o, _callbacks, '_menuExpanding');
 
     },
     onScrolling: function(t, b, c, d) {
 
-      return _resolveCallback.call(t, _defaultCallbacks, '_onScrolling', t, b, c, d);
+      return _resolveCallback.call(t, _callbacks, '_onScrolling', t, b, c, d);
+
+    },
+    onScrollingComplete: function(o) {
+
+      return _resolveCallback.call(o, _callbacks, '_onScrollingComplete');
 
     }
   };
 
-  /////////////////////
-  // Private methods //
-  /////////////////////
+  // ------------------------------------------------------------------------
+  // Private methods
+  // ------------------------------------------------------------------------
 
+  //
   // _resolveCallback resolves the passed dependency and either stores it or
   // calls it with given arguments
+  //
   var _resolveCallback = function(callbackObject, callbackFunction) {
 
     // If a function, store the reference to it for further usage
@@ -101,20 +152,22 @@ function Scrollol(navSelector, options) {
       // Else, let's assume this is just a bunch of arguments that needs
       // to be passed to an already stored function
       var args = Array.prototype.slice.apply(arguments).splice(2, Number.MAX_VALUE);
+      console.log(callbackObject, callbackFunction);
       return callbackObject[callbackFunction].apply(this, args);
     }
 
     return;
 
-
   };
 
+  //
   // _getElementsBySelector Returns the given element based on passed selector
   // which can be either id or class name.
+  //
   function _getElementsBySelector(selector) {
 
     if (selector === null || typeof selector !== 'string') {
-      throw "You must specify a correct menu selector as first arugment";
+      throw "You must specify a correct menu selector as first argument";
     }
 
     if (selector.substr(0, 1) === '#') {
@@ -125,149 +178,101 @@ function Scrollol(navSelector, options) {
 
   }
 
+  //
   // _setMenuItemState alters the classList of the passed element to give it
   // the correct state.
+  //
   function _setMenuItemState(element, state) {
 
-    var addClass = (state === true) ? _defaultOptions.activeClass : _defaultOptions.inactiveClass;
-    var removeClass = (state === false || state === undefined) ? _defaultOptions.activeClass : _defaultOptions.inactiveClass;
 
-    if (element.classList.contains(addClass) && !element.classList.contains(removeClass)) {
-      return 0;
+    _setElementState(element, state);
+
+    if (state === true) {
+      _callbackContainer.menuItemActive(element, state);
+    } else {
+      _callbackContainer.menuItemInactive(element, state);
     }
 
-    element.classList.add(addClass);
-    element.classList.remove(removeClass);
 
-    _setElementState(element,state);
-
-    return (state === true) ? 1 : -1;
+    //return (state === true) ? 1 : -1;
 
   }
 
-
+  //
   // _getSubmenu returns the menu element sub menu, which is the first UL sibling.
+  //
   function _getSubmenu(menuElement) {
-
-    while ((menuElement = menuElement.nextSibling) && menuElement.nodeName !== 'UL'); // Oh the wonders of functional programming in JavaScript
+    while ((menuElement = menuElement.nextSibling) && menuElement.nodeName !== 'UL');
     return menuElement;
   }
 
-  // _withinViewPort calculates if the element is within viewport.
-  function _withinViewPort(element) {
+  //
+  // _sectionWithinViewPort calculates if the element is within viewport.
+  //
+  function _sectionWithinViewPort(element) {
     var viewportHeight = (window.innerHeight || document.documentElement.clientHeight);
     var rect = element.getBoundingClientRect();
     return (rect.bottom > 0 && rect.top - viewportHeight < 0);
   }
 
-  //  _requestAnimationFrame is a shim for requestAnimationFrame in case the user
-  //  browser is older than God.
-  var _requestAnimationFrame = (function() {
-    return window.requestAnimationFrame ||
-      window.webkitRequestAnimationFrame ||
-      window.mozRequestAnimationFrame ||
-      function(callback) {
-        window.setTimeout(callback, 1000 / 60);
-      };
-  })();
-
+  //
   // _scroll scrolls the page based on the given pixel offset.
   // The animation can be customized using the onScrolling callback
   // and implementing a custom scrolling equation.
+  //
   function _scroll(destination) {
-
 
     var start = document.documentElement.scrollTop || document.body.scrollTop;
     var now = 0;
-    var duration = _defaultOptions.scrollSpeed;
+    var speed = _defaultOptions.scrollSpeed;
 
     var _animate = function() {
 
       now += 10;
-      window.scrollTo(0, _callbacks.onScrolling(now, start, destination, duration));
+      window.scrollTo(0, _callbackContainer.onScrolling(now, start, destination, speed));
 
-      // do the animation unless its over
-      if (now < duration) {
-        _requestAnimationFrame(_animate);
+      if (now < speed) {
+        requestAnimationFrame(_animate);
       } else {
-        _callbacks.scrolledToSection();
+        _callbackContainer.onScrollingComplete();
       }
     };
     _animate();
   }
 
+  //
   // _setElementState sets the elements data-scrollol-state attribute to given state
-  function _setElementState(element,state) {
-    element.setAttribute(_dataStateAttribute,state);
+  //
+  function _setElementState(element, state) {
+    element.setAttribute(_dataStateAttribute, state);
   }
 
+  //
   // _getElementState returns the elements data-scrollol-state attribute as boolean
   // if attribute is null, true is default
+  //
   function _getElementState(element) {
     var state = element.getAttribute(_dataStateAttribute);
     return (state === null || state === 'true') || state !== 'false';
   }
 
+  //
   // _setupEventListeners initializes all event listeners (scrolling, clicking, etc)
+  //
   function _setupEventListeners() {
+    window.onscroll = window.onresize = _setupOnScrollEventListeners; // On scroll
+    _setupOnClickEventListeners(); // On click
+  }
 
-    var _onScrolling = function() {
-
-      var previousHighlighted;
-      var numActive = 0;
-
-      _menuLinks.forEach(function(menuLink) {
-
-        var container = document.querySelector(menuLink.getAttribute('data-target'));
-        var submenu = _getSubmenu(menuLink);
-
-        // Iterate through all containers, showing those within viewport
-        if (_withinViewPort(container)) {
-
-          // Highlight menu item
-          if (_getElementState(menuLink) === false || menuLink.getAttribute(_dataStateAttribute) === null)
-            numActive += _setMenuItemState(menuLink, true);
-
-          // Expand any submenu
-          if (submenu !== null && _getElementState(submenu) === false) {
-            _setElementState(submenu,true);
-            _callbacks.menuExpanded(submenu);
-          }
-
-
-          if (_defaultOptions.highlightNewest === true) {
-
-            // Only remove highlight if there is more than one highlight present.
-            if (previousHighlighted !== undefined && numActive !== 1) {
-              numActive += _setMenuItemState(previousHighlighted, false);
-            }
-            previousHighlighted = menuLink;
-          }
-
-        } else {
-          if (_getElementState(menuLink) === true)
-            numActive += _setMenuItemState(menuLink, false);
-
-          if (submenu !== null && _getElementState(submenu) === true) {
-            //_callbacks._menuCollapsed(submenu);
-            _setElementState(submenu,false);
-            _callbacks.menuCollapsed(submenu);
-          }
-
-        }
-
-      }.bind(this));
-    };
-
+  function _setupOnClickEventListeners() {
     // Listen for menu click events
-
     _menuLinks.forEach(function(menuLink) {
       menuLink.addEventListener('click', function(event) {
 
         event.preventDefault();
         event.stopPropagation();
 
-        _callbacks.clickedOnMenu(menuLink, container);
+        _callbackContainer.clickedOnMenu(menuLink, container);
 
         var container = document.querySelector(menuLink.getAttribute('data-target'));
 
@@ -278,6 +283,10 @@ function Scrollol(navSelector, options) {
             block: "start"
           });
 
+          // Fire onScrollingComplete event. This will fire right after
+          // clickedOnMenu but is kept for conformity reasons.
+          _callbackContainer.onScrollingComplete();
+
         } else {
           _scroll(container.getBoundingClientRect().top);
         }
@@ -287,17 +296,54 @@ function Scrollol(navSelector, options) {
 
     });
 
+  }
 
-    window.onscroll = window.onresize = _onScrolling;
-    _onScrolling();
+  //
+  // _setupOnScrollEventListeners handles scrolling events
+  //
+  function _setupOnScrollEventListeners() {
 
+    _menuLinks.forEach(function(menuLink) {
+
+      var container = document.querySelector(menuLink.getAttribute('data-target'));
+      var submenu = _getSubmenu(menuLink);
+
+      // Iterate through all containers, showing those within viewport
+      if (_sectionWithinViewPort(container)) {
+
+        // Highlight menu item
+        if (_getElementState(menuLink) === false || menuLink.getAttribute(_dataStateAttribute) === null)
+          _setMenuItemState(menuLink, true);
+
+        // Expand any submenu
+        if (submenu !== null && _getElementState(submenu) === false) {
+          _setElementState(submenu, true);
+          _callbackContainer.menuExpanding(submenu);
+        }
+
+
+      } else {
+        if (_getElementState(menuLink) === true)
+          _setMenuItemState(menuLink, false);
+
+
+
+
+        if (submenu !== null && _getElementState(submenu) === true) {
+          _setElementState(submenu, false);
+          _callbackContainer.menuCollapsing(submenu);
+        }
+
+      }
+
+    });
 
   }
 
-  ///////////////////
-  //   Construct   //
-  ///////////////////
-  
+  // ------------------------------------------------------------------------
+  //   Construct
+  // ------------------------------------------------------------------------
+
   (function _constructor() {
 
     var navigation = _getElementsBySelector(navSelector);
@@ -345,6 +391,6 @@ function Scrollol(navSelector, options) {
     _setupEventListeners();
   })();
 
-  return _callbacks;
+  return _callbackContainer;
 
 }
