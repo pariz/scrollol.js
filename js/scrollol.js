@@ -268,7 +268,7 @@ function Scrollol(navSelector, options) {
   // _setupOnScrollEventListeners listens for onscroll/onresize events
   //
   function _setupOnScrollEventListeners() {
-    window.onscroll = window.onresize = _onScroll;
+    window.onscroll = window.onresize = window.onload = _onScroll;
   }
 
   //
