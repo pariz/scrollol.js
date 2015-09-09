@@ -4,7 +4,30 @@
 	top:20vh;
 	font-size:.85em;
 
+<<<<<<< HEAD
 	ul {
+=======
+
+
+	.nav-heading ul {
+
+
+		transition: max-height 1s;
+		transition-timing-function: ease;
+		
+		&.menu-opened {
+			max-height: 200px;
+			overflow: hidden;
+
+
+		}
+
+		&.menu-closed {
+			max-height:0px;
+			overflow: hidden;
+
+		}
+>>>>>>> gh-pages
 
 		position:relative;
 		display:block;
@@ -31,12 +54,28 @@
 
 			a {
 
+<<<<<<< HEAD
 		    &.active {
 		      color: pink;
 					font-weight:bold;
 		    }
 		    &.inactive {
 		      //color: blue;
+=======
+				padding-left:.5em;
+				transition: 0.2s all;
+
+		    &.active {
+		      color: blue;
+					font-weight:bold;
+					border-left:10px solid red;
+
+				}
+		    &.inactive {
+		      //color: blue;
+
+		      border-left:2px solid red;
+>>>>>>> gh-pages
 		    }
 
 			}
