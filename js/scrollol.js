@@ -12,12 +12,9 @@ function Scrollol(navSelector, options) {
   var _menuLinks;
   var _targetContainers;
 
-<<<<<<< HEAD
-=======
   // States
   var _isOnscrollInited = false;
 
->>>>>>> gh-pages
   // Default options
   var _defaultOptions = {
     scrollSpeed: 500,
@@ -37,22 +34,6 @@ function Scrollol(navSelector, options) {
   var _callbacks = {
 
     _clickedOnMenu: function() {
-<<<<<<< HEAD
-      //console.log("_clickedOnMenu", this);
-    },
-
-    _menuItemActive: function() {
-      var element = this;
-      var addClass = _defaultOptions.activeClass;
-      var removeClass = _defaultOptions.inactiveClass;
-
-      if (element.classList.contains(addClass) && !element.classList.contains(removeClass)) {
-        return;
-      }
-
-      element.classList.add(addClass);
-      element.classList.remove(removeClass);
-=======
       console.log("default callbacks","_clickedOnMenu", this);
     },
 
@@ -67,23 +48,10 @@ function Scrollol(navSelector, options) {
 
       this.classList.add(addClass);
       this.classList.remove(removeClass);
->>>>>>> gh-pages
 
     },
 
     _menuItemInactive: function() {
-<<<<<<< HEAD
-      var element = this;
-      var addClass = _defaultOptions.inactiveClass;
-      var removeClass = _defaultOptions.activeClass;
-
-      if (element.classList.contains(addClass) && !element.classList.contains(removeClass)) {
-        return; // 0;
-      }
-
-      element.classList.add(addClass);
-      element.classList.remove(removeClass);
-=======
       console.log("default callbacks","_menuItemInActive",this);
       var addClass = _defaultOptions.inactiveClass;
       var removeClass = _defaultOptions.activeClass;
@@ -94,36 +62,25 @@ function Scrollol(navSelector, options) {
 
       this.classList.add(addClass);
       this.classList.remove(removeClass);
->>>>>>> gh-pages
     },
 
     // _menuCollapsing handles the menu collapsing. If this function is overridden
     // using the API, the developer is responsible for hiding the menu
     _menuCollapsing: function() {
-<<<<<<< HEAD
-=======
       console.log("default callbacks","_menuCollapsing",this);
->>>>>>> gh-pages
       this.style.display = 'none';
     },
 
     // _menuExpanding handles the menu expansion. If this function is overridden
     // using the API, the developer is responsible for showing the menu
     _menuExpanding: function() {
-<<<<<<< HEAD
-=======
       console.log("default callbacks","_menuExpanding",this);
->>>>>>> gh-pages
       this.style.display = 'block';
     },
 
     // _onScrolling conforms to the easing equations by Robert Penner.
     // For more equations, visit http://gizma.com/easing/
     _onScrolling: function(t, b, c, d) {
-<<<<<<< HEAD
-
-=======
->>>>>>> gh-pages
       // Quadratic easing
       t /= d / 2;
       if (t < 1) {
@@ -135,11 +92,7 @@ function Scrollol(navSelector, options) {
 
     // _onScrollingComplete fires whenever a scroll is completed.
     _onScrollingComplete: function() {
-<<<<<<< HEAD
-      //console.log("Scrolling complete", this);
-=======
       console.log("default callbacks","_onScrollingComplete", this);
->>>>>>> gh-pages
     }
 
 
@@ -203,10 +156,6 @@ function Scrollol(navSelector, options) {
       // Else, let's assume this is just a bunch of arguments that needs
       // to be passed to an already stored function
       var args = Array.prototype.slice.apply(arguments).splice(2, Number.MAX_VALUE);
-<<<<<<< HEAD
-      console.log(callbackObject, callbackFunction);
-=======
->>>>>>> gh-pages
       return callbackObject[callbackFunction].apply(this, args);
     }
 
@@ -247,12 +196,6 @@ function Scrollol(navSelector, options) {
       _callbackContainer.menuItemInactive(element, state);
     }
 
-<<<<<<< HEAD
-
-    //return (state === true) ? 1 : -1;
-
-=======
->>>>>>> gh-pages
   }
 
   //
@@ -317,12 +260,6 @@ function Scrollol(navSelector, options) {
   // _setupEventListeners initializes all event listeners (scrolling, clicking, etc)
   //
   function _setupEventListeners() {
-<<<<<<< HEAD
-    window.onscroll = window.onresize = _setupOnScrollEventListeners; // On scroll
-    _setupOnClickEventListeners(); // On click
-  }
-
-=======
     _setupOnScrollEventListeners(); // On scroll
     _setupOnClickEventListeners(); // On click
   }
@@ -337,7 +274,6 @@ function Scrollol(navSelector, options) {
   //
   // _setupOnClickEventListeners listens for click events on the menu
   //
->>>>>>> gh-pages
   function _setupOnClickEventListeners() {
     // Listen for menu click events
     _menuLinks.forEach(function(menuLink) {
@@ -373,15 +309,9 @@ function Scrollol(navSelector, options) {
   }
 
   //
-<<<<<<< HEAD
-  // _setupOnScrollEventListeners handles scrolling events
-  //
-  function _setupOnScrollEventListeners() {
-=======
   // _onScroll handles scrolling events
   //
   function _onScroll() {
->>>>>>> gh-pages
 
     _menuLinks.forEach(function(menuLink) {
 
@@ -396,31 +326,16 @@ function Scrollol(navSelector, options) {
           _setMenuItemState(menuLink, true);
 
         // Expand any submenu
-<<<<<<< HEAD
-        if (submenu !== null && _getElementState(submenu) === false) {
-=======
         if (submenu !== null && (_getElementState(submenu) === false || !_isOnscrollInited)) {
->>>>>>> gh-pages
           _setElementState(submenu, true);
           _callbackContainer.menuExpanding(submenu);
         }
 
-<<<<<<< HEAD
-
-=======
->>>>>>> gh-pages
       } else {
         if (_getElementState(menuLink) === true)
           _setMenuItemState(menuLink, false);
 
-<<<<<<< HEAD
-
-
-
-        if (submenu !== null && _getElementState(submenu) === true) {
-=======
         if (submenu !== null && (_getElementState(submenu) === true || !_isOnscrollInited)) {
->>>>>>> gh-pages
           _setElementState(submenu, false);
           _callbackContainer.menuCollapsing(submenu);
         }
@@ -429,11 +344,8 @@ function Scrollol(navSelector, options) {
 
     });
 
-<<<<<<< HEAD
-=======
     _isOnscrollInited = true;
 
->>>>>>> gh-pages
   }
 
   // ------------------------------------------------------------------------

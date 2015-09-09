@@ -4,17 +4,13 @@
 	top:20vh;
 	font-size:.85em;
 
-<<<<<<< HEAD
-	ul {
-=======
-
 
 	.nav-heading ul {
 
 
 		transition: max-height 1s;
 		transition-timing-function: ease;
-		
+
 		&.menu-opened {
 			max-height: 200px;
 			overflow: hidden;
@@ -27,7 +23,6 @@
 			overflow: hidden;
 
 		}
->>>>>>> gh-pages
 
 		position:relative;
 		display:block;
@@ -54,14 +49,6 @@
 
 			a {
 
-<<<<<<< HEAD
-		    &.active {
-		      color: pink;
-					font-weight:bold;
-		    }
-		    &.inactive {
-		      //color: blue;
-=======
 				padding-left:.5em;
 				transition: 0.2s all;
 
@@ -75,7 +62,7 @@
 		      //color: blue;
 
 		      border-left:2px solid red;
->>>>>>> gh-pages
+
 		    }
 
 			}
