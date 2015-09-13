@@ -1,6 +1,7 @@
 function Scrollol(navSelector, options) {
   "use strict";
   var _dataStateAttribute = "data-scrollol-state-active";
+  var _dataTargetAttribute = "data-scrollol-target";
   var _navigation;
   var _menuLinks;
   var _targetContainers;
@@ -11,7 +12,7 @@ function Scrollol(navSelector, options) {
     inactiveClass: "inactive",
     smoothScrolling: true
   };
-  var _callbacks = {
+  var _eventsAndCallbacks = {
     _clickedOnMenu: function() {},
     _menuItemActive: function() {
       var addClass = _defaultOptions.activeClass;
@@ -37,7 +38,7 @@ function Scrollol(navSelector, options) {
     _menuExpanding: function() {
       this.style.display = "block";
     },
-    _onScrolling: function(t, b, c, d) {
+    _scrolling: function(t, b, c, d) {
       t /= d / 2;
       if (t < 1) {
         return c / 2 * t * t + b;
@@ -47,35 +48,35 @@ function Scrollol(navSelector, options) {
     },
     _onScrollingComplete: function() {}
   };
-  var _callbackContainer = {
+  var _eventsAndCallbacksContainer = {
     clickedOnMenu: function(o) {
-      return _resolveCallback.call(o, _callbacks, "_clickedOnMenu");
+      return _storeOrResolveCallback.call(o, _eventsAndCallbacks, "_clickedOnMenu");
     },
     menuItemActive: function(o, state) {
-      return _resolveCallback.call(o, _callbacks, "_menuItemActive", state);
+      return _storeOrResolveCallback.call(o, _eventsAndCallbacks, "_menuItemActive", state);
     },
     menuItemInactive: function(o, state) {
-      return _resolveCallback.call(o, _callbacks, "_menuItemInactive", state);
+      return _storeOrResolveCallback.call(o, _eventsAndCallbacks, "_menuItemInactive", state);
     },
     menuCollapsing: function(o) {
-      return _resolveCallback.call(o, _callbacks, "_menuCollapsing");
+      return _storeOrResolveCallback.call(o, _eventsAndCallbacks, "_menuCollapsing");
     },
     menuExpanding: function(o) {
-      return _resolveCallback.call(o, _callbacks, "_menuExpanding");
+      return _storeOrResolveCallback.call(o, _eventsAndCallbacks, "_menuExpanding");
     },
-    onScrolling: function(t, b, c, d) {
-      return _resolveCallback.call(t, _callbacks, "_onScrolling", t, b, c, d);
+    scrolling: function(t, b, c, d) {
+      return _storeOrResolveCallback.call(t, _eventsAndCallbacks, "_scrolling", t, b, c, d);
     },
     onScrollingComplete: function(o) {
-      return _resolveCallback.call(o, _callbacks, "_onScrollingComplete");
+      return _storeOrResolveCallback.call(o, _eventsAndCallbacks, "_onScrollingComplete");
     }
   };
-  var _resolveCallback = function(callbackObject, callbackFunction) {
+  var _storeOrResolveCallback = function(cbObj, cbFunctionName) {
     if (typeof this === "function") {
-      callbackObject[callbackFunction] = this;
+      cbObj[cbFunctionName] = this;
     } else {
       var args = Array.prototype.slice.apply(arguments).splice(2, Number.MAX_VALUE);
-      return callbackObject[callbackFunction].apply(this, args);
+      return cbObj[cbFunctionName].apply(this, args);
     }
     return;
   };
@@ -91,9 +92,9 @@ function Scrollol(navSelector, options) {
   function _setMenuItemState(element, state) {
     _setElementState(element, state);
     if (state === true) {
-      _callbackContainer.menuItemActive(element, state);
+      _eventsAndCallbacksContainer.menuItemActive(element, state);
     } else {
-      _callbackContainer.menuItemInactive(element, state);
+      _eventsAndCallbacksContainer.menuItemInactive(element, state);
     }
   }
   function _getSubmenu(menuElement) {
@@ -111,11 +112,11 @@ function Scrollol(navSelector, options) {
     var speed = _defaultOptions.scrollSpeed;
     var _animate = function() {
       now += 10;
-      window.scrollTo(0, _callbackContainer.onScrolling(now, start, destination, speed));
+      window.scrollTo(0, _eventsAndCallbacksContainer.scrolling(now, start, destination, speed));
       if (now < speed) {
         requestAnimationFrame(_animate);
       } else {
-        _callbackContainer.onScrollingComplete();
+        _eventsAndCallbacksContainer.onScrollingComplete();
       }
     };
     _animate();
@@ -137,15 +138,15 @@ function Scrollol(navSelector, options) {
   function _setupOnClickEventListeners() {
     _menuLinks.forEach(function(menuLink) {
       menuLink.addEventListener("click", function(event) {
+        if (_eventsAndCallbacksContainer.clickedOnMenu(menuLink, container)) return;
         event.preventDefault();
         event.stopPropagation();
-        _callbackContainer.clickedOnMenu(menuLink, container);
-        var container = document.querySelector(menuLink.getAttribute("data-target"));
+        var container = document.querySelector(menuLink.getAttribute(_dataTargetAttribute));
         if (_defaultOptions.smoothScrolling === false) {
           container.scrollIntoView({
             block: "start"
           });
-          _callbackContainer.onScrollingComplete();
+          _eventsAndCallbacksContainer.onScrollingComplete();
         } else {
           _scroll(container.getBoundingClientRect().top);
         }
@@ -154,19 +155,19 @@ function Scrollol(navSelector, options) {
   }
   function _onScroll() {
     _menuLinks.forEach(function(menuLink) {
-      var container = document.querySelector(menuLink.getAttribute("data-target"));
+      var container = document.querySelector(menuLink.getAttribute(_dataTargetAttribute));
       var submenu = _getSubmenu(menuLink);
       if (_sectionWithinViewPort(container)) {
         if (_getElementState(menuLink) === false || menuLink.getAttribute(_dataStateAttribute) === null) _setMenuItemState(menuLink, true);
         if (submenu !== null && (_getElementState(submenu) === false || !_isOnscrollInited)) {
           _setElementState(submenu, true);
-          _callbackContainer.menuExpanding(submenu);
+          _eventsAndCallbacksContainer.menuExpanding(submenu);
         }
       } else {
         if (_getElementState(menuLink) === true) _setMenuItemState(menuLink, false);
         if (submenu !== null && (_getElementState(submenu) === true || !_isOnscrollInited)) {
           _setElementState(submenu, false);
-          _callbackContainer.menuCollapsing(submenu);
+          _eventsAndCallbacksContainer.menuCollapsing(submenu);
         }
       }
     });
@@ -178,8 +179,8 @@ function Scrollol(navSelector, options) {
       throw 'Menu selector is incorrect, must be a string containing a reference to a class or id, for example "#my-menu" or .my-menu"';
     }
     var targetContainers = [];
-    var menuLinks = Array.prototype.slice.call(navigation.querySelectorAll("[data-target]")).filter(function(node) {
-      var targetValue = node.getAttribute("data-target");
+    var menuLinks = Array.prototype.slice.call(navigation.querySelectorAll("[" + _dataTargetAttribute + "]")).filter(function(node) {
+      var targetValue = node.getAttribute(_dataTargetAttribute);
       var targetNode = _getElementsBySelector(targetValue);
       if (targetValue === "") {
         return false;
@@ -198,5 +199,5 @@ function Scrollol(navSelector, options) {
     }
     _setupEventListeners();
   })();
-  return _callbackContainer;
+  return _eventsAndCallbacksContainer;
 }
