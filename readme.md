@@ -6,6 +6,7 @@ Scrollol.js is minimalistic and does not use any third party libraries. It also 
 # Installation
 
 Download [the zip](https://github.com/pariz/scrollol.js/archive/master.zip) or clone the repo `git clone https://github.com/pariz/scrollol.js.git`.
+
 Or reference it directly from the rawgit CDN: `<script type="text/javascript" src="https://cdn.rawgit.com/pariz/scrollol.js/master/dist/scrollol.min.js"></script>`
 
 # Usage
